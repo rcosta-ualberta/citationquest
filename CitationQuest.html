@@ -1,0 +1,514 @@
+!DOCTYPE html
+html lang=en
+head
+meta charset=UTF-8
+meta name=viewport content=width=device-width, initial-scale=1.0
+titleMLA Citation Practicetitle
+style
+  root{
+    --ink#1f2430; --paper#ffffff; --accent#2f5d62; --accent2#7a9e7e;
+    --wrong#b3261e; --right#1b7f4d; --line#d8dee6; --soft#f4f6f8;
+  }
+  {box-sizingborder-box}
+  body{
+    margin0; font-familyGeorgia,Times New Roman,serif; colorvar(--ink);
+    backgroundvar(--soft); line-height1.5;
+  }
+  .wrap{max-width900px; margin0 auto; padding16px}
+  header{backgroundvar(--accent); colorwhite; padding18px 16px; border-radius12px}
+  h1{margin0 0 6px; font-size1.45rem}
+  header p{margin0; opacity.92; font-familysystem-ui,sans-serif; font-size.95rem}
+  nav{displayflex; gap8px; margin16px 0; flex-wrapwrap}
+  button, .token button{
+    font-familysystem-ui,sans-serif; font-size.95rem;
+    border1px solid var(--line); backgroundwhite; colorvar(--ink);
+    padding9px 13px; border-radius8px; cursorpointer;
+  }
+  buttonhover{border-colorvar(--accent)}
+  buttonfocus-visible, .tokenfocus-within{
+    outline3px solid #ffb703; outline-offset2px;
+  }
+  .tab.active{backgroundvar(--accent); colorwhite; border-colorvar(--accent)}
+  .panel{displaynone; backgroundwhite; border1px solid var(--line); border-radius12px; padding16px}
+  .panel.active{displayblock}
+  .qnum{font-familysystem-ui,sans-serif; font-weight700; colorvar(--accent); margin-bottom6px}
+  .prompt{font-size1.05rem; margin0 0 12px}
+  .source{font-styleitalic}
+  .tokens{displayflex; flex-directioncolumn; gap8px; margin12px 0}
+  .token{
+    displayflex; align-itemscenter; gap8px; background#fbfcfd;
+    border1px solid var(--line); border-radius8px; padding8px 10px;
+  }
+  .token .txt{flex1}
+  .token.dragging{opacity.45}
+  .token .move{padding4px 8px}
+  .distractor-note{font-familysystem-ui,sans-serif; font-size.85rem; color#666}
+  .actions{displayflex; gap8px; flex-wrapwrap; margin-top12px}
+  .primary{backgroundvar(--accent); colorwhite; border-colorvar(--accent)}
+  .feedback{margin-top12px; padding12px; border-radius8px; font-familysystem-ui,sans-serif}
+  .feedback.correct{background#e7f5ec; border1px solid var(--right)}
+  .feedback.incorrect{background#fdecea; border1px solid var(--wrong)}
+  .correct-citation{font-styleitalic; margin-top6px}
+  .choices{displaygrid; gap8px; margin12px 0}
+  .choice{text-alignleft}
+  .choice.correct{border-colorvar(--right); background#e7f5ec}
+  .choice.incorrect{border-colorvar(--wrong); background#fdecea}
+  .choicedisabled{cursordefault}
+  details{margin14px 0; border1px solid var(--line); border-radius8px; background#fbfcfd}
+  summary{padding10px 12px; font-familysystem-ui,sans-serif; font-weight600; cursorpointer}
+  .wc-list{padding0 16px 14px; font-size.95rem}
+  .wc-list li{margin-bottom8px}
+  .result{margin-top16px}
+  .score{font-size1.2rem; font-weight700}
+  .review-item{border-left4px solid var(--wrong); padding10px 12px; margin10px 0; background#fff}
+  .review-item .label{font-familysystem-ui,sans-serif; font-weight700; colorvar(--wrong)}
+  .hidden{displaynone}
+  .hint{font-familysystem-ui,sans-serif; font-size.9rem; color#555}
+  @media(max-width600px){
+    .wrap{padding10px}
+    .panel{padding12px}
+    h1{font-size1.2rem}
+  }
+style
+head
+body
+div class=wrap
+  header
+    h1MLA Citation Practiceh1
+    pBuild Works Cited entries and practise in-text citations for your English papers.p
+  header
+
+  nav aria-label=Game modes
+    button class=tab active id=tab-wc aria-controls=panel-wcWorks Cited Gamebutton
+    button class=tab id=tab-it aria-controls=panel-itIn-Text Citation Gamebutton
+  nav
+
+  section class=panel active id=panel-wc aria-labelledby=tab-wc
+    h2Works Cited Creationh2
+    p class=hintDrag the citation parts into the correct MLA 9 order. You can also use the arrow buttons for keyboard access. Some parts are distractors and should strongnotstrong be used.p
+    details
+      summaryShow Works Cited reference listsummary
+      ol class=wc-list id=wc-referenceol
+    details
+    div id=wc-gamediv
+    div class=result hidden id=wc-resultdiv
+  section
+
+  section class=panel id=panel-it aria-labelledby=tab-it
+    h2In-Text Citation Practiceh2
+    p class=hintChoose the correct MLA in-text citation for each situation.p
+    details
+      summaryShow Works Cited reference listsummary
+      ol class=wc-list id=wc-reference2ol
+    details
+    div id=it-gamediv
+    div class=result hidden id=it-resultdiv
+  section
+div
+
+script
+const worksCited = [
+  `King, Thomas. “One Good Story, That One.” span class=sourceOne Good Story, That Onespan, HarperCollins, 1993, pp. 3–10.`,
+  `Umezurike, Uchechukwu Peter. “Driving through a Blizzard for a Taste of Home.” span class=sourceCBC Newsspan, 24 Jan. 2022, www.cbc.canewsinteractivesfeaturesdriving-through-a-blizzard-for-a-taste-of-home.`,
+  `Kimmerer, Robin Wall. span class=sourceBraiding Sweetgrass Indigenous Wisdom, Scientific Knowledge, and the Teachings of Plantsspan. Milkweed Editions, 2013.`,
+  `Kimmerer, Robin Wall. “Braiding Sweetgrass Skywoman Falling.” span class=sourceTweetSpeak Poetryspan, 20 Dec. 2018, tweetspeakpoetry.com20181220skywoman-falling-reprint-from-braiding-sweetgrass-by-robin-wall-kimmerer.`,
+  `Donald, Dwayne. “We Need a New Story Walking and the Wâhkôhtowin Imagination.” span class=sourceJournal of the Canadian Association for Curriculum Studiesspan, vol. 18, no. 2, 2021, pp. 53–63, doi.org10.250711916-4467.40492.`,
+  `span class=sourceôtênawspan. Directed by Conor McNally, teachings by Dwayne Donald, Canadian Filmmakers Distribution Centre, 2017.`,
+  `Le Guin, Ursula K. “The Author of the Acacia Seeds And Other Extracts from the Journal of the Association of Therolinguistics.” span class=sourceThe Unreal and the Real The Selected Short Stories of Ursula K. Le Guinspan, Simon and Schuster, 2017, pp. 617–25.`,
+  `Le Guin, Ursula K. “The Author of the Acacia Seeds And Other Extracts from the Journal of the Association of Therolinguistics.” span class=sourceThe Compass Rosespan, HarperCollins, 1988, pp. 6–15.`,
+  `Le Guin, Ursula K. “The Author of the Acacia Seeds And Other Extracts from the Journal of the Association of Therolinguistics.” span class=sourceXenoflesh Ecocriticism and Literaturespan, xenoflesh.wordpress.comwp-contentuploads201703ursula-k.-le-guin.pdf.`,
+  `Beaton, Kate. span class=sourceDucks Two Years in the Oil Sandsspan. Drawn &amp; Quarterly, 2022.`,
+  `Swift, Jonathan. “A Modest Proposal.” span class=sourceSwift’s Irish Writings Selected Prose and Poetryspan, edited by Carole Fabricant and Robert Mahony, Palgrave Macmillan, 2010, pp. 123–31.`,
+  `Rankine, Claudia. span class=sourceCitizen An American Lyricspan. Graywolf Press, 2014.`,
+  `Woolf, Virginia. span class=sourceA Room of One’s Ownspan. Hogarth Press, 1929.`,
+  `Melville, Herman. “Loomings.” span class=sourceMoby-Dick A Norton Critical Editionspan, edited by Hershel Parker, 3rd ed., W. W. Norton &amp; Company, 2017, pp. 16–20.`,
+  `Shelley, Mary. span class=sourceFrankenstein Annotated for Scientists, Engineers, and Creators of All Kindsspan. Edited by David H. Guston et al., MIT Press, 2017.`
+];
+
+const wcQuestions = [
+  {
+    label “King, ‘One Good Story, That One’”,
+    correct [“King, Thomas.”, ““One Good Story, That One.””, “One Good Story, That One,”, “HarperCollins,”, “1993,”, “pp. 3–10.”],
+    distractors [“Print.”, “Thomas King.”]
+  },
+  {
+    label “Umezurike, CBC article”,
+    correct [“Umezurike, Uchechukwu Peter.”, ““Driving through a Blizzard for a Taste of Home.””, “CBC News,”, “24 Jan. 2022,”, “www.cbc.canewsinteractivesfeaturesdriving-through-a-blizzard-for-a-taste-of-home.”],
+    distractors [“Accessed 19 Oct. 2026.”, “CBC,”]
+  },
+  {
+    label “Kimmerer, Braiding Sweetgrass”,
+    correct [“Kimmerer, Robin Wall.”, “Braiding Sweetgrass Indigenous Wisdom, Scientific Knowledge, and the Teachings of Plants.”, “Milkweed Editions,”, “2013.”],
+    distractors [“pp. 1–331.”, “Print.”]
+  },
+  {
+    label “Kimmerer, ‘Skywoman Falling’ web reprint”,
+    correct [“Kimmerer, Robin Wall.”, ““Braiding Sweetgrass Skywoman Falling.””, “TweetSpeak Poetry,”, “20 Dec. 2018,”, “tweetspeakpoetry.com20181220skywoman-falling-reprint-from-braiding-sweetgrass-by-robin-wall-kimmerer.”],
+    distractors [“Milkweed Editions,”, “Print.”]
+  },
+  {
+    label “Donald, journal article”,
+    correct [“Donald, Dwayne.”, ““We Need a New Story Walking and the Wâhkôhtowin Imagination.””, “Journal of the Canadian Association for Curriculum Studies,”, “vol. 18, no. 2,”, “2021,”, “pp. 53–63,”, “doi.org10.250711916-4467.40492.”],
+    distractors [“Mar. 2021,”, “Print.”]
+  },
+  {
+    label “ôtênaw, film”,
+    correct [“ôtênaw.”, “Directed by Conor McNally,”, “teachings by Dwayne Donald,”, “Canadian Filmmakers Distribution Centre,”, “2017.”],
+    distractors [“McNally, Conor, dir.”, “Print.”]
+  },
+  {
+    label “Le Guin, The Unreal and the Real”,
+    correct [“Le Guin, Ursula K.”, ““The Author of the Acacia Seeds And Other Extracts from the Journal of the Association of Therolinguistics.””, “The Unreal and the Real The Selected Short Stories of Ursula K. Le Guin,”, “Simon and Schuster,”, “2017,”, “pp. 617–25.”],
+    distractors [“The Compass Rose,”, “1988,”]
+  },
+  {
+    label “Le Guin, The Compass Rose”,
+    correct [“Le Guin, Ursula K.”, ““The Author of the Acacia Seeds And Other Extracts from the Journal of the Association of Therolinguistics.””, “The Compass Rose,”, “HarperCollins,”, “1988,”, “pp. 6–15.”],
+    distractors [“The Unreal and the Real,”, “2017,”]
+  },
+  {
+    label “Le Guin, Xenoflesh PDF”,
+    correct [“Le Guin, Ursula K.”, ““The Author of the Acacia Seeds And Other Extracts from the Journal of the Association of Therolinguistics.””, “Xenoflesh Ecocriticism and Literature,”, “xenoflesh.wordpress.comwp-contentuploads201703ursula-k.-le-guin.pdf.”],
+    distractors [“HarperCollins,”, “pp. 6–15.”]
+  },
+  {
+    label “Beaton, Ducks”,
+    correct [“Beaton, Kate.”, “Ducks Two Years in the Oil Sands.”, “Drawn & Quarterly,”, “2022.”],
+    distractors [“Graphic novel.”, “Print.”]
+  },
+  {
+    label “Swift, ‘A Modest Proposal’”,
+    correct [“Swift, Jonathan.”, ““A Modest Proposal.””, “Swift’s Irish Writings Selected Prose and Poetry,”, “edited by Carole Fabricant and Robert Mahony,”, “Palgrave Macmillan,”, “2010,”, “pp. 123–31.”],
+    distractors [“Edited by Jonathan Swift.”, “pp. 123–131.”]
+  },
+  {
+    label “Rankine, Citizen”,
+    correct [“Rankine, Claudia.”, “Citizen An American Lyric.”, “Graywolf Press,”, “2014.”],
+    distractors [“Print.”, “Poetry.”]
+  },
+  {
+    label “Woolf, A Room of One’s Own”,
+    correct [“Woolf, Virginia.”, “A Room of One’s Own.”, “Hogarth Press,”, “1929.”],
+    distractors [“Print.”, “Virginia Woolf.”]
+  },
+  {
+    label “Melville, ‘Loomings’”,
+    correct [“Melville, Herman.”, ““Loomings.””, “Moby-Dick A Norton Critical Edition,”, “edited by Hershel Parker,”, “3rd ed.,”, “W. W. Norton & Company,”, “2017,”, “pp. 16–20.”],
+    distractors [“Norton Critical Edition,”, “Print.”]
+  },
+  {
+    label “Shelley, Frankenstein”,
+    correct [“Shelley, Mary.”, “Frankenstein Annotated for Scientists, Engineers, and Creators of All Kinds.”, “Edited by David H. Guston et al.,”, “MIT Press,”, “2017.”],
+    distractors [“Line-edited by Charles E. Robinson,”, “Print.”]
+  }
+];
+
+const itQuestions = [
+  {
+    prompt `You quote from Thomas King’s “One Good Story, That One” on page 5. Which in-text citation is correct`,
+    choices [“(King 5)”, “(King, 5)”, “(Thomas King 5)”, “(“One Good Story” 5)”],
+    answer 0,
+    explain `For a work by one author with a page number, use the author’s last name and the page (King 5).`
+  },
+  {
+    prompt `You paraphrase Umezurike’s CBC article, which has no page numbers. Which citation is correct`,
+    choices [“(Umezurike)”, “(Umezurike, n.p.)”, “(CBC News)”, “(Umezurike 1)”],
+    answer 0,
+    explain `When a web source has no page numbers, cite only the author (Umezurike).`
+  },
+  {
+    prompt `You quote from Kimmerer’s Braiding Sweetgrass on page 12. Which citation is correct`,
+    choices [“(Kimmerer 12)”, “(Kimmerer, 12)”, “(Braiding Sweetgrass 12)”, “(Robin Wall Kimmerer 12)”],
+    answer 0,
+    explain `Use the author’s last name and page number (Kimmerer 12).`
+  },
+  {
+    prompt `You refer to Kimmerer’s “Braiding Sweetgrass Skywoman Falling,” a web reprint with no page numbers. Which citation is correct`,
+    choices [“(Kimmerer)”, “(Kimmerer, “Skywoman Falling”)”, “(TweetSpeak Poetry)”, “(Kimmerer 2018)”],
+    answer 0,
+    explain `With no page numbers, cite the author. Because there is only one Kimmerer source being used here, (Kimmerer) is sufficient.`
+  },
+  {
+    prompt `You quote Donald’s journal article on page 56. Which citation is correct`,
+    choices [“(Donald 56)”, “(Donald, 56)”, “(“We Need a New Story” 56)”, “(Dwayne Donald 56)”],
+    answer 0,
+    explain `For a paginated journal article, use author and page (Donald 56).`
+  },
+  {
+    prompt `You refer to the film ôtênaw in your sentence. Which parenthetical citation is correct`,
+    choices [“(ôtênaw)”, “(McNally)”, “(Donald)”, “(Canadian Filmmakers Distribution Centre)”],
+    answer 0,
+    explain `A film is cited by its title when no author is listed first (ôtênaw).`
+  },
+  {
+    prompt `You quote Le Guin’s “The Author of the Acacia Seeds” from The Unreal and the Real, page 619. Which citation is correct`,
+    choices [“(Le Guin 619)”, “(Le Guin, “The Author of the Acacia Seeds” 619)”, “(“Acacia Seeds” 619)”, “(Ursula K. Le Guin 619)”],
+    answer 0,
+    explain `Because only one Le Guin source is being cited in this scenario, (Le Guin 619) is enough.`
+  },
+  {
+    prompt `Your essay cites both Le Guin’s story in The Unreal and the Real and the version in The Compass Rose. You quote page 9 of The Compass Rose version. Which citation is correct`,
+    choices [“(Le Guin, “The Author of the Acacia Seeds” 9)”, “(Le Guin 9)”, “(The Compass Rose 9)”, “(Le Guin, The Compass Rose 9)”],
+    answer 0,
+    explain `When citing more than one work by the same author, include a shortened title (Le Guin, “The Author of the Acacia Seeds” 9).`
+  },
+  {
+    prompt `You paraphrase the PDF version of Le Guin’s “The Author of the Acacia Seeds,” which has no page numbers. Which citation is correct`,
+    choices [“(Le Guin)”, “(Le Guin, n.p.)”, “(Xenoflesh)”, “(Le Guin PDF)”],
+    answer 0,
+    explain `For an unpaginated web source, cite only the author (Le Guin).`
+  },
+  {
+    prompt `You refer to a panel on page 45 of Beaton’s Ducks. Which citation is correct`,
+    choices [“(Beaton 45)”, “(Beaton, 45)”, “(Ducks 45)”, “(Kate Beaton 45)”],
+    answer 0,
+    explain `Graphic novels with page numbers use the usual author-page form (Beaton 45).`
+  },
+  {
+    prompt `You quote Swift’s “A Modest Proposal” on page 125 of the assigned edition. Which citation is correct`,
+    choices [“(Swift 125)”, “(Swift, “A Modest Proposal” 125)”, “(Fabricant and Mahony 125)”, “(“A Modest Proposal” 125)”],
+    answer 0,
+    explain `The editors appear in the Works Cited entry, but the in-text citation uses the author of the quoted work (Swift 125).`
+  },
+  {
+    prompt `You quote Rankine’s Citizen on page 33. Which citation is correct`,
+    choices [“(Rankine 33)”, “(Rankine, 33)”, “(Citizen 33)”, “(Claudia Rankine 33)”],
+    answer 0,
+    explain `Use author last name and page (Rankine 33).`
+  },
+  {
+    prompt `You quote Woolf’s A Room of One’s Own on page 12. Which citation is correct`,
+    choices [“(Woolf 12)”, “(Woolf, 12)”, “(A Room of One’s Own 12)”, “(Virginia Woolf 12)”],
+    answer 0,
+    explain `For a book with a page number, use author and page (Woolf 12).`
+  },
+  {
+    prompt `You quote Melville’s “Loomings” on page 18 of the Norton Critical Edition. Which citation is correct`,
+    choices [“(Melville 18)”, “(Parker 18)”, “(Moby-Dick 18)”, “(Melville, “Loomings” 18)”],
+    answer 0,
+    explain `Use the author of the chapterstory and the page (Melville 18).`
+  },
+  {
+    prompt `You quote Shelley’s Frankenstein on page 102 of the annotated edition. Which citation is correct`,
+    choices [“(Shelley 102)”, “(Guston et al. 102)”, “(Frankenstein 102)”, “(Mary Shelley 102)”],
+    answer 0,
+    explain `The editors are listed in the Works Cited entry, but the in-text citation names the author of the novel (Shelley 102).`
+  }
+];
+
+function makeReferenceList(id){
+  const ol = document.getElementById(id);
+  worksCited.forEach(item={
+    const li=document.createElement('li');
+    li.innerHTML=item;
+    ol.appendChild(li);
+  });
+}
+makeReferenceList('wc-reference');
+makeReferenceList('wc-reference2');
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i0;i--){
+    const j=Math.floor(Math.random()(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function buildWorksCitedGame(){
+  const container=document.getElementById('wc-game');
+  let index=0, results=[];
+
+  function render(){
+    container.innerHTML='';
+    if(index=wcQuestions.length){showResult();return;}
+    const q=wcQuestions[index];
+    const card=document.createElement('div');
+    card.className='panel active';
+    card.innerHTML=`p class=qnumQuestion ${index+1} of ${wcQuestions.length}p
+      p class=promptPut the parts of the Works Cited entry in the correct MLA order for strong${q.label}strong.p
+      p class=distractor-noteDrag parts into order, or select a part and use its arrow buttons. Do not use distractor parts.p
+      div class=tokens id=token-areadiv
+      div class=actions
+        button class=primary id=wc-checkCheck answerbutton
+      div
+      div id=wc-feedbackdiv`;
+    container.appendChild(card);
+
+    const area=card.querySelector('#token-area');
+    const all=shuffle([...q.correct,...q.distractors]);
+    all.forEach((text,i)={
+      const row=document.createElement('div');
+      row.className='token';
+      row.draggable=true;
+      row.dataset.text=text;
+      row.tabIndex=0;
+      row.innerHTML=`span class=txt${text}span
+        button class=move aria-label=Move ${text} up↑button
+        button class=move aria-label=Move ${text} down↓button`;
+      row.querySelector('.move').addEventListener('click',e={
+        if(e.target.textContent==='↑' && row.previousElementSibling){
+          area.insertBefore(row,row.previousElementSibling);
+        } else if(e.target.textContent==='↓' && row.nextElementSibling){
+          area.insertBefore(row.nextElementSibling,row);
+        }
+        row.focus();
+      });
+      row.addEventListener('dragstart',()=row.classList.add('dragging'));
+      row.addEventListener('dragend',()=row.classList.remove('dragging'));
+      area.appendChild(row);
+    });
+
+    area.addEventListener('dragover',e={
+      e.preventDefault();
+      const dragging=area.querySelector('.dragging');
+      const after=getDragAfterElement(area,e.clientY);
+      if(after==null){area.appendChild(dragging);}
+      else{area.insertBefore(dragging,after);}
+    });
+
+    card.querySelector('#wc-check').addEventListener('click',()={
+      const chosen=[...area.querySelectorAll('.token')].map(t=t.dataset.text);
+      const isCorrect = chosen.length===q.correct.length &&
+        chosen.every((t,i)=t===q.correct[i]);
+      results.push({labelq.label,correctisCorrect,correctAnswerq.correct.join(' ')});
+      const fb=card.querySelector('#wc-feedback');
+      fb.className='feedback '+(isCorrect'correct''incorrect');
+      fb.innerHTML=isCorrect
+         `strongCorrect.strong The entry is in the proper MLA order.`
+         `strongNot quite.strong The correct entry isdiv class=correct-citation${q.correct.join(' ')}div`;
+      card.querySelectorAll('button').forEach(b=b.disabled=true);
+      const next=document.createElement('button');
+      next.className='primary';
+      next.textContent = index===wcQuestions.length-1  'See results'  'Next question';
+      next.addEventListener('click',()={index++;render();});
+      card.querySelector('.actions').appendChild(next);
+      next.focus();
+    });
+  }
+
+  function getDragAfterElement(container,y){
+    const items=[...container.querySelectorAll('.tokennot(.dragging)')];
+    return items.reduce((closest,child)={
+      const box=child.getBoundingClientRect();
+      const offset=y-box.top-box.height2;
+      if(offset0 && offsetclosest.offset){return{offset,elementchild};}
+      return closest;
+    },{offset-Infinity}).element;
+  }
+
+  function showResult(){
+    const right=results.filter(r=r.correct).length;
+    const box=document.getElementById('wc-result');
+    box.classList.remove('hidden');
+    let html=`h3Works Cited resultsh3
+      p class=scoreYou got ${right} of ${results.length} correct.p`;
+    const wrong=results.filter(r=!r.correct);
+    if(wrong.length){
+      html+=`h4Review incorrect answersh4`;
+      wrong.forEach(r={
+        html+=`div class=review-itemdiv class=label${r.label}div
+          pCorrect Works Cited entryp
+          p class=correct-citation${r.correctAnswer}pdiv`;
+      });
+    } else {
+      html+=`pExcellent work—every Works Cited entry was correct.p`;
+    }
+    html+=`button class=primary id=wc-restartRestart Works Cited gamebutton`;
+    box.innerHTML=html;
+    box.querySelector('#wc-restart').addEventListener('click',()={
+      box.classList.add('hidden');
+      index=0; results=[]; render();
+    });
+  }
+
+  render();
+}
+
+function buildInTextGame(){
+  const container=document.getElementById('it-game');
+  let index=0, results=[];
+
+  function render(){
+    container.innerHTML='';
+    if(index=itQuestions.length){showResult();return;}
+    const q=itQuestions[index];
+    const card=document.createElement('div');
+    card.className='panel active';
+    card.innerHTML=`p class=qnumQuestion ${index+1} of ${itQuestions.length}p
+      p class=prompt${q.prompt}p
+      div class=choicesdiv
+      div id=it-feedbackdiv`;
+    container.appendChild(card);
+    const choices=card.querySelector('.choices');
+
+    q.choices.forEach((choice,i)={
+      const btn=document.createElement('button');
+      btn.className='choice';
+      btn.textContent=choice;
+      btn.addEventListener('click',()={
+        const correct=i===q.answer;
+        results.push({promptq.prompt,correct,correctAnswerq.choices[q.answer],explainq.explain});
+        [...choices.children].forEach((b,j)={
+          b.disabled=true;
+          if(j===q.answer)b.classList.add('correct');
+          else if(j===i && !correct)b.classList.add('incorrect');
+        });
+        const fb=card.querySelector('#it-feedback');
+        fb.className='feedback '+(correct'correct''incorrect');
+        fb.innerHTML=(correct'strongCorrect.strong ''strongNot quite.strong ')+q.explain;
+        const next=document.createElement('button');
+        next.className='primary';
+        next.textContent = index===itQuestions.length-1  'See results'  'Next question';
+        next.addEventListener('click',()={index++;render();});
+        card.appendChild(next);
+        next.focus();
+      });
+      choices.appendChild(btn);
+    });
+  }
+
+  function showResult(){
+    const right=results.filter(r=r.correct).length;
+    const box=document.getElementById('it-result');
+    box.classList.remove('hidden');
+    let html=`h3In-text citation resultsh3
+      p class=scoreYou got ${right} of ${results.length} correct.p`;
+    const wrong=results.filter(r=!r.correct);
+    if(wrong.length){
+      html+=`h4Review incorrect answersh4`;
+      wrong.forEach(r={
+        html+=`div class=review-itemp${r.prompt}p
+          div class=labelCorrect answer ${r.correctAnswer}div
+          p${r.explain}pdiv`;
+      });
+    } else {
+      html+=`pExcellent work—every in-text citation was correct.p`;
+    }
+    html+=`button class=primary id=it-restartRestart in-text gamebutton`;
+    box.innerHTML=html;
+    box.querySelector('#it-restart').addEventListener('click',()={
+      box.classList.add('hidden');
+      index=0; results=[]; render();
+    });
+  }
+
+  render();
+}
+
+document.getElementById('tab-wc').addEventListener('click',()=switchTab('wc'));
+document.getElementById('tab-it').addEventListener('click',()=switchTab('it'));
+
+function switchTab(name){
+  ['wc','it'].forEach(n={
+    document.getElementById('tab-'+n).classList.toggle('active',n===name);
+    document.getElementById('panel-'+n).classList.toggle('active',n===name);
+  });
+}
+
+buildWorksCitedGame();
+buildInTextGame();
+script
+body
+html
